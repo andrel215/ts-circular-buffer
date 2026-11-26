@@ -37,3 +37,10 @@ The trade-off is that capacity is fixed at construction. If you need unbounded g
 ## The awkward edge
 
 `shift()` and `peek()` return `undefined` when the buffer is empty, and `undefined` is also a legal value to store. That means `buf.shift() === undefined` does not tell you whether the buffer was empty — check `buf.isEmpty` first if you care. `at()` has the same ambiguity for out-of-range indices. This is a deliberate choice to keep the hot path branch-free; the alternative would be a sentinel object or a `{ value, found }` wrapper, both of which cost an allocation per call.
+
+## Performance
+
+The window keeps a bounded buffer, so `push` is constant time and memory does not
+grow with the length of the stream. `peak` and `trough` are linear in the window
+size, which is the trade that keeps `push` cheap.
+
